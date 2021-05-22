@@ -1,32 +1,37 @@
 package com.stabbers.geofood.service;
 
 import com.stabbers.geofood.entity.RoleEntity;
+import com.stabbers.geofood.entity.ShopEntity;
 import com.stabbers.geofood.entity.UserEntity;
-import com.stabbers.geofood.repository.RoleEntityRepository;
-import com.stabbers.geofood.repository.UserEntityRepository;
+import com.stabbers.geofood.repository.RoleRepository;
+import com.stabbers.geofood.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class UserService {
-//    @Bean
-//    PasswordEncoder getEncoder() {
-//        return new BCryptPasswordEncoder();
-//    }
-
     @Autowired
-    private UserEntityRepository userEntityRepository;
+    private UserRepository userEntityRepository;
     @Autowired
-    private RoleEntityRepository roleEntityRepository;
+    private RoleRepository roleRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public UserEntity saveUser(UserEntity userEntity) {
-        RoleEntity userRole = roleEntityRepository.findByName("ROLE_USER");
-        userEntity.setRoleEntity(userRole);
-        userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
-        return userEntityRepository.save(userEntity);
+    public UserEntity saveUser(UserEntity user) {
+        RoleEntity userRole = roleRepository.findByName("ROLE_USER");
+        user.setRole(userRole);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userEntityRepository.save(user);
+    }
+
+    public UserEntity saveAdmin(UserEntity user) {
+        RoleEntity userRole = roleRepository.findByName("ROLE_ADMIN");
+        user.setRole(userRole);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userEntityRepository.save(user);
     }
 
     public UserEntity findByLogin(String login) {
@@ -34,10 +39,10 @@ public class UserService {
     }
 
     public UserEntity findByLoginAndPassword(String login, String password) {
-        UserEntity userEntity = findByLogin(login);
-        if (userEntity != null) {
-            if (passwordEncoder.matches(password, userEntity.getPassword())) {
-                return userEntity;
+        UserEntity user = findByLogin(login);
+        if (user != null) {
+            if (passwordEncoder.matches(password, user.getPassword())) {
+                return user;
             }
         }
         return null;
